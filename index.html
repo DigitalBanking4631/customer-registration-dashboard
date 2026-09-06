@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pan Asia EZY Registration Dashboard</title>
+<title>Customer Registration Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -172,7 +172,7 @@ select:focus, input:focus {
 /* KPI Cards */
 .cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -381,21 +381,24 @@ tbody tr:hover { background: #f8fafc; }
   </div>
 
   <!-- KPI Cards -->
-  <div class="cards">
+  <div class="cards kpi-cards">
+
     <div class="card">
       <div class="label">Total User Base</div>
       <div class="value" id="total">0</div>
-      <div class="small">Total Registered User Base</div>
+      <div class="small">Total current filtered users</div>
     </div>
 
     <div class="card">
       <div class="label">Active User Base</div>
       <div class="value" id="active">0</div>
+      <div class="small">Customer Status = Active</div>
     </div>
 
     <div class="card">
       <div class="label">Locked User Base</div>
       <div class="value" id="locked">0</div>
+      <div class="small">Customer Status = Locked</div>
     </div>
 
     <div class="card">
@@ -403,19 +406,32 @@ tbody tr:hover { background: #f8fafc; }
       <div class="value" id="initiated">0</div>
       <div class="small">Registered but not activated</div>
     </div>
+
+    <div class="card">
+      <div class="label">Activation Rate</div>
+      <div class="value" id="rate">0%</div>
+      <div class="small">Active User Base ÷ (Active + Initiated)</div>
+    </div>
+
   </div>
 
   <div class="charts-grid">
     <div class="panel chart-panel">
-      <h2>Registration Breakdown By Type </h2>
+      <h2>Registration Type Distribution</h2>
       <div class="chart-wrap"><canvas id="registrationChart"></canvas></div>
     </div>
-    <div class="grid2">
-    <div class="panel">
+    <div class="panel chart-panel">
       <h2>Registration Type Summary</h2>
       <div class="table-wrap">
         <table id="regSummary">
-          <thead><tr><th>Registration Type</th><th>Registered</th><th>Activated</th><th>Activation %</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Registration Type</th>
+              <th>Registered</th>
+              <th>Activated</th>
+              <th>Activation %</th>
+            </tr>
+          </thead>
           <tbody></tbody>
         </table>
       </div>
@@ -423,6 +439,11 @@ tbody tr:hover { background: #f8fafc; }
     <div class="panel chart-panel">
       <h2>Customer Status</h2>
       <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+    </div>
+
+    <div class="panel chart-panel">
+      <h2>Top 10 Branches by Registration</h2>
+      <div class="chart-wrap tall"><canvas id="branchChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
       <h2>Daily Registration Progress</h2>
@@ -437,10 +458,6 @@ tbody tr:hover { background: #f8fafc; }
     <div class="panel chart-panel">
       <h2>IB / MB Activation</h2>
       <div class="chart-wrap"><canvas id="activationChannelChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
-      <h2>Data Migration Status</h2>
-      <div class="chart-wrap"><canvas id="dataMigrationChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
       <h2>Activity Status</h2>
@@ -469,13 +486,10 @@ tbody tr:hover { background: #f8fafc; }
         </div>
       </div>
     </div>
-    <div class="panel chart-panel">
-      <h2>Top 10 Branches by Registration</h2>
-      <div class="chart-wrap tall"><canvas id="branchChart"></canvas></div>
-    </div>
   </div>
-  
-    <div class="panel">
+
+  <div class="grid2">
+    <div class="panel" style="grid-column: 1 / -1;">
       <h2>Channel Summary</h2>
       <div class="table-wrap">
         <table id="channelSummary" class="summary-matrix">
@@ -1005,8 +1019,7 @@ function renderCharts() {
   makeBarChart("branchChart", topBranches.map(x => x[0]), topBranches.map(x => x[1]), { horizontal: true });
 
   // Categorical
-  categoricalChart("dataMigrationChart", "Data Migration Status");
-  categoricalChart("activityChart", "Activity Status");
+categoricalChart("activityChart", "Activity Status");
 
   // Activation channel
   const activationChannel = {
@@ -1038,10 +1051,17 @@ function render() {
     String(r["Customer Status"] || "").trim().toLowerCase() === "initiated"
   ).length;
 
+  // Activation Rate = Active User Base ÷ (Active User Base + Initiated User Base)
+  const registeredUsers = activeUsers + initiatedUsers;
+  const activationRate = registeredUsers
+    ? (activeUsers / registeredUsers) * 100
+    : 0;
+
   document.getElementById("total").textContent = totalUsers.toLocaleString();
   document.getElementById("active").textContent = activeUsers.toLocaleString();
   document.getElementById("locked").textContent = lockedUsers.toLocaleString();
   document.getElementById("initiated").textContent = initiatedUsers.toLocaleString();
+  document.getElementById("rate").textContent = activationRate.toFixed(1) + "%";
 
   // Registration summary
   const types = {};
