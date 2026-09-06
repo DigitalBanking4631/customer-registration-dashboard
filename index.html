@@ -442,6 +442,12 @@ tbody tr:hover { background: #f8fafc; }
       <div class="chart-wrap tall"><canvas id="branchChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
+      <h2>Top 10 Branches by Activations</h2>
+      <div class="chart-wrap tall">
+        <canvas id="branchActivationChart"></canvas>
+      </div>
+    </div>
+    <div class="panel chart-panel">
       <h2>Daily Registration Progress</h2>
       <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
       <div class="chart-note">Grouped by Created Date Time day</div>
@@ -1013,7 +1019,40 @@ function renderCharts() {
   const branches = countBy("Branch Code");
   const topBranches = Object.entries(branches).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10);
   makeBarChart("branchChart", topBranches.map(x => x[0]), topBranches.map(x => x[1]), { horizontal: true });
+// Top 10 Branches by Activations
+const activatedBranches = {};
 
+FILTERED
+  .filter(r =>
+    String(r["Customer Status"] || "")
+      .trim()
+      .toLowerCase() === "active"
+  )
+  .forEach(r => {
+
+    const branch =
+      String(r["Branch Code"] || "").trim() || "Blank";
+
+    activatedBranches[branch] =
+      (activatedBranches[branch] || 0) + 1;
+  });
+
+const topActivatedBranches =
+  Object.entries(activatedBranches)
+    .sort((a, b) =>
+      b[1] - a[1] || a[0].localeCompare(b[0])
+    )
+    .slice(0, 10);
+
+makeBarChart(
+  "branchActivationChart",
+  topActivatedBranches.map(x => x[0]),
+  topActivatedBranches.map(x => x[1]),
+  {
+    horizontal: true,
+    label: "Activations"
+  }
+);
   // Categorical
 categoricalChart("activityChart", "Activity Status");
 
