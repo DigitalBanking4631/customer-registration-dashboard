@@ -607,6 +607,76 @@ tbody tr:hover { background: #f8fafc; }
     padding: 16px 6px 6px;
   }
 }
+
+/* =========================
+   iOS / MOBILE COMPACT FIX
+   Prevent Safari automatic text enlargement
+   ========================= */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+@media (max-width: 480px) {
+  .header {
+    margin-bottom: 12px;
+  }
+
+  .header-left {
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 1.05rem !important;
+  }
+
+  .subtitle {
+    font-size: 0.75rem !important;
+  }
+
+  /* Keep the two main actions compact and side-by-side */
+  .actions {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+
+  .actions button {
+    min-height: 38px;
+    padding: 8px 6px;
+    font-size: 0.75rem;
+  }
+
+  .statusbar {
+    padding: 9px 12px;
+    font-size: 0.72rem;
+    margin-bottom: 12px;
+  }
+
+  .filters {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .filter-grid {
+    gap: 10px;
+  }
+
+  label {
+    font-size: 0.68rem;
+    margin-bottom: 4px;
+  }
+
+  select, input {
+    height: 38px;
+    font-size: 0.8rem;
+  }
+
+  .filter-actions button {
+    min-height: 38px;
+    font-size: 0.75rem;
+  }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
