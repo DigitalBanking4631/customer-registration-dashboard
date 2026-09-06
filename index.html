@@ -1,9 +1,10 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Registration Dashboard</title>
+<title>Pan Asia EZY Registration Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -348,7 +349,7 @@ tbody tr:hover { background: #f8fafc; }
       <div class="logo-placeholder">CR</div>
       <div>
         <h1>Customer Registration Dashboard</h1>
-        <div class="subtitle">Registered base = Active + Initiated &nbsp;|&nbsp; Activated base = Active only</div>
+        <div class="subtitle">User base overview by Customer Status</div>
       </div>
     </div>
     <div class="actions">
@@ -356,6 +357,7 @@ tbody tr:hover { background: #f8fafc; }
       <button class="secondary" onclick="downloadCSV()">Export Filtered CSV</button>
     </div>
   </div>
+
   <div class="statusbar">
     <div><span id="statusDot" class="dot"></span><span id="sourceStatus">Waiting for Google Sheets data…</span></div>
     <div id="lastUpdated">Last updated: —</div>
@@ -378,17 +380,45 @@ tbody tr:hover { background: #f8fafc; }
     </div>
   </div>
 
+  <!-- KPI Cards -->
   <div class="cards">
-    <div class="card"><div class="label">Total User Records</div><div class="value" id="total">0</div><div class="small">Current filtered records</div></div>
-    <div class="card"><div class="label">Registered User Base</div><div class="value" id="registered">0</div><div class="small">Active + Initiated</div></div>
-    <div class="card"><div class="label">Activated User Base</div><div class="value" id="activated">0</div><div class="small">Active only</div></div>
-    <div class="card"><div class="label">Activation Rate</div><div class="value" id="rate">0%</div><div class="small">Activated ÷ Registered</div></div>
+    <div class="card">
+      <div class="label">Total User Base</div>
+      <div class="value" id="total">0</div>
+      <div class="small">Total Registered User Base</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Active User Base</div>
+      <div class="value" id="active">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Locked User Base</div>
+      <div class="value" id="locked">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Initiated User Base</div>
+      <div class="value" id="initiated">0</div>
+      <div class="small">Registered but not activated</div>
+    </div>
   </div>
 
   <div class="charts-grid">
     <div class="panel chart-panel">
-      <h2>Registration Type Distribution</h2>
+      <h2>Registration Breakdown By Type </h2>
       <div class="chart-wrap"><canvas id="registrationChart"></canvas></div>
+    </div>
+    <div class="grid2">
+    <div class="panel">
+      <h2>Registration Type Summary</h2>
+      <div class="table-wrap">
+        <table id="regSummary">
+          <thead><tr><th>Registration Type</th><th>Registered</th><th>Activated</th><th>Activation %</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
     <div class="panel chart-panel">
       <h2>Customer Status</h2>
@@ -405,36 +435,12 @@ tbody tr:hover { background: #f8fafc; }
       <div class="chart-note">Grouped by Created Date Time month</div>
     </div>
     <div class="panel chart-panel">
-      <h2>Customer Type</h2>
-      <div class="chart-wrap"><canvas id="customerTypeChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
-      <h2>Identification Type</h2>
-      <div class="chart-wrap"><canvas id="identificationChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
-      <h2>Registration Validation Status</h2>
-      <div class="chart-wrap"><canvas id="validationChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
-      <h2>2FA Method</h2>
-      <div class="chart-wrap"><canvas id="twofaChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
       <h2>IB / MB Activation</h2>
       <div class="chart-wrap"><canvas id="activationChannelChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
-      <h2>T&amp;C Acceptance</h2>
-      <div class="chart-wrap"><canvas id="termsChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
       <h2>Data Migration Status</h2>
       <div class="chart-wrap"><canvas id="dataMigrationChart"></canvas></div>
-    </div>
-    <div class="panel chart-panel">
-      <h2>MB Inactivation Status</h2>
-      <div class="chart-wrap"><canvas id="mbInactivationChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
       <h2>Activity Status</h2>
@@ -468,17 +474,7 @@ tbody tr:hover { background: #f8fafc; }
       <div class="chart-wrap tall"><canvas id="branchChart"></canvas></div>
     </div>
   </div>
-
-  <div class="grid2">
-    <div class="panel">
-      <h2>Registration Type Summary</h2>
-      <div class="table-wrap">
-        <table id="regSummary">
-          <thead><tr><th>Registration Type</th><th>Registered</th><th>Activated</th><th>Activation %</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
+  
     <div class="panel">
       <h2>Channel Summary</h2>
       <div class="table-wrap">
@@ -541,7 +537,7 @@ tbody tr:hover { background: #f8fafc; }
     </div>
   </div>
 
-  <div class="footer">Customer Registration Dashboard • Google Sheets  live sync • Filters run in the browser</div>
+  <div class="footer">Customer Registration Dashboard • Google Sheets CSV live sync • Filters run in the browser</div>
 </div>
 
 <script>
@@ -1009,12 +1005,7 @@ function renderCharts() {
   makeBarChart("branchChart", topBranches.map(x => x[0]), topBranches.map(x => x[1]), { horizontal: true });
 
   // Categorical
-  categoricalChart("customerTypeChart", "Customer Type");
-  categoricalChart("identificationChart", "Identification Type");
-  categoricalChart("validationChart", "Registration Validation Status");
-  categoricalChart("twofaChart", "2FA Method");
   categoricalChart("dataMigrationChart", "Data Migration Status");
-  categoricalChart("mbInactivationChart", "MB Inactivation Status");
   categoricalChart("activityChart", "Activity Status");
 
   // Activation channel
@@ -1024,12 +1015,6 @@ function renderCharts() {
   };
   makeBarChart("activationChannelChart", Object.keys(activationChannel), Object.values(activationChannel));
 
-  // T&C
-  const terms = {
-    "Accepted": FILTERED.filter(r => String(r["Latest T&C Accepted By Customer"] || "").trim() !== "").length,
-    "Not Accepted": FILTERED.filter(r => String(r["Latest T&C Accepted By Customer"] || "").trim() === "").length
-  };
-  makeDoughnut("termsChart", Object.keys(terms), Object.values(terms));
 }
 
 /* ---------- Render ---------- */
@@ -1037,13 +1022,26 @@ function render() {
   if (isRendering) return;
   isRendering = true;
 
-  const registered = FILTERED.filter(r => ["Active", "Initiated"].includes(r["Customer Status"])).length;
-  const activated = FILTERED.filter(r => r["Customer Status"] === "Active").length;
+  /* ---------- KPI Calculations ---------- */
 
-  document.getElementById("total").textContent = FILTERED.length.toLocaleString();
-  document.getElementById("registered").textContent = registered.toLocaleString();
-  document.getElementById("activated").textContent = activated.toLocaleString();
-  document.getElementById("rate").textContent = (registered ? ((activated / registered) * 100).toFixed(1) : "0") + "%";
+  const totalUsers = FILTERED.length;
+
+  const activeUsers = FILTERED.filter(r =>
+    String(r["Customer Status"] || "").trim().toLowerCase() === "active"
+  ).length;
+
+  const lockedUsers = FILTERED.filter(r =>
+    String(r["Customer Status"] || "").trim().toLowerCase() === "locked"
+  ).length;
+
+  const initiatedUsers = FILTERED.filter(r =>
+    String(r["Customer Status"] || "").trim().toLowerCase() === "initiated"
+  ).length;
+
+  document.getElementById("total").textContent = totalUsers.toLocaleString();
+  document.getElementById("active").textContent = activeUsers.toLocaleString();
+  document.getElementById("locked").textContent = lockedUsers.toLocaleString();
+  document.getElementById("initiated").textContent = initiatedUsers.toLocaleString();
 
   // Registration summary
   const types = {};
@@ -1215,7 +1213,7 @@ function csvParse(text) {
 
 async function refreshData() {
   try {
-    setStatus("Loading data from Google Sheet …", "warn");
+    setStatus("Loading data from Google Sheet (CSV)…", "warn");
     const url = GOOGLE_CSV_URL + (GOOGLE_CSV_URL.includes("?") ? "&" : "?") + "_ts=" + Date.now();
     const res = await fetch(url, {
       method: "GET",
@@ -1242,11 +1240,11 @@ async function refreshData() {
     FILTERED = [...DATA];
     currentPage = 1;
     render();
-    setStatus(`Google Sheet connected • ${DATA.length.toLocaleString()} rows`, "ok");
+    setStatus(`Google Sheet connected (CSV) • ${DATA.length.toLocaleString()} rows`, "ok");
     document.getElementById("lastUpdated").textContent =
       "Last successful sync: " + new Date().toLocaleString();
   } catch (e) {
-    console.error("Google Sheet error:", e);
+    console.error("Google Sheet CSV error:", e);
     const msg = String(e.message || e);
     const isCors = msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("CORS") || msg.includes("Load failed");
     if (isCors) {
@@ -1254,7 +1252,7 @@ async function refreshData() {
       document.getElementById("lastUpdated").textContent =
         "Do not open the HTML as a file. Use a local server (VS Code Live Server, or run: npx serve)";
     } else {
-      setStatus("Sync failed Please Retry  — " + msg, "error");
+      setStatus("Google Sheet CSV sync failed — " + msg, "error");
       document.getElementById("lastUpdated").textContent = "Sync error: " + msg;
     }
   }
@@ -1282,3 +1280,5 @@ setTimeout(refreshData, 400);
 </script>
 </body>
 </html>
+
+```
