@@ -41,10 +41,39 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   margin-bottom: 16px;
   flex-wrap: wrap;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.logo-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
 }
 h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
 .subtitle { color: var(--muted); font-size: 0.8125rem; margin-top: 4px; }
@@ -300,7 +329,8 @@ tbody tr:hover { background: #f8fafc; }
 @media (max-width: 640px) {
   .container { padding: 12px; }
   .cards { grid-template-columns: 1fr; }
-  .header { flex-direction: column; }
+  .header { flex-direction: column; align-items: flex-start; }
+  .header-left { width: 100%; }
   .filter-grid { grid-template-columns: 1fr 1fr; }
   .records-footer { flex-direction: column; align-items: flex-start; }
 }
@@ -310,16 +340,22 @@ tbody tr:hover { background: #f8fafc; }
 <body>
 <div class="container">
   <div class="header">
-    <div>
-      <h1>Customer Registration Dashboard</h1>
-      <div class="subtitle">Registered base = Active + Initiated &nbsp;|&nbsp; Activated base = Active only</div>
+    <div class="header-left">
+      <!-- Replace the div below with your logo image:
+           <img class="logo" src="your-logo.png" alt="Logo">
+           Or put a full URL: src="https://example.com/logo.png"
+      -->
+      <div class="logo-placeholder">CR</div>
+      <div>
+        <h1>Customer Registration Dashboard</h1>
+        <div class="subtitle">Registered base = Active + Initiated &nbsp;|&nbsp; Activated base = Active only</div>
+      </div>
     </div>
     <div class="actions">
       <button onclick="refreshData()">↻ Sync Google Sheet (CSV)</button>
       <button class="secondary" onclick="downloadCSV()">Export Filtered CSV</button>
     </div>
   </div>
-
   <div class="statusbar">
     <div><span id="statusDot" class="dot"></span><span id="sourceStatus">Waiting for Google Sheets data…</span></div>
     <div id="lastUpdated">Last updated: —</div>
@@ -505,7 +541,7 @@ tbody tr:hover { background: #f8fafc; }
     </div>
   </div>
 
-  <div class="footer">Customer Registration Dashboard • Google Sheets CSV live sync • Filters run in the browser</div>
+  <div class="footer">Customer Registration Dashboard • Google Sheets  live sync • Filters run in the browser</div>
 </div>
 
 <script>
@@ -1179,7 +1215,7 @@ function csvParse(text) {
 
 async function refreshData() {
   try {
-    setStatus("Loading data from Google Sheet (CSV)…", "warn");
+    setStatus("Loading data from Google Sheet …", "warn");
     const url = GOOGLE_CSV_URL + (GOOGLE_CSV_URL.includes("?") ? "&" : "?") + "_ts=" + Date.now();
     const res = await fetch(url, {
       method: "GET",
@@ -1206,11 +1242,11 @@ async function refreshData() {
     FILTERED = [...DATA];
     currentPage = 1;
     render();
-    setStatus(`Google Sheet connected (CSV) • ${DATA.length.toLocaleString()} rows`, "ok");
+    setStatus(`Google Sheet connected • ${DATA.length.toLocaleString()} rows`, "ok");
     document.getElementById("lastUpdated").textContent =
       "Last successful sync: " + new Date().toLocaleString();
   } catch (e) {
-    console.error("Google Sheet CSV error:", e);
+    console.error("Google Sheet error:", e);
     const msg = String(e.message || e);
     const isCors = msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("CORS") || msg.includes("Load failed");
     if (isCors) {
@@ -1218,7 +1254,7 @@ async function refreshData() {
       document.getElementById("lastUpdated").textContent =
         "Do not open the HTML as a file. Use a local server (VS Code Live Server, or run: npx serve)";
     } else {
-      setStatus("Google Sheet CSV sync failed — " + msg, "error");
+      setStatus("Sync failed Please Retry  — " + msg, "error");
       document.getElementById("lastUpdated").textContent = "Sync error: " + msg;
     }
   }
