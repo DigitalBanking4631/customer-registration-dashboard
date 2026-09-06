@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customer Registration Dashboard</title>
+<title>Pan Asia EZY Registration Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -348,13 +348,13 @@ tbody tr:hover { background: #f8fafc; }
       -->
       <div class="logo-placeholder">CR</div>
       <div>
-        <h1>Customer Registration Dashboard</h1>
-        <div class="subtitle">User base overview by Customer Status</div>
+        <h1>Pan Asia EZY Registration Dashboard</h1>
+        <div class="subtitle">Build for More</div>
       </div>
     </div>
     <div class="actions">
-      <button onclick="refreshData()">↻ Sync Google Sheet (CSV)</button>
-      <button class="secondary" onclick="downloadCSV()">Export Filtered CSV</button>
+      <button onclick="refreshData()">↻ Sync Google Sheet </button>
+      <button class="secondary" onclick="downloadCSV()">Export Filtered Detailes</button>
     </div>
   </div>
 
@@ -410,14 +410,14 @@ tbody tr:hover { background: #f8fafc; }
     <div class="card">
       <div class="label">Activation Rate</div>
       <div class="value" id="rate">0%</div>
-      <div class="small">Active User Base ÷ (Active + Initiated)</div>
+      <div class="small">Active User Base / (Active / Initiated)</div>
     </div>
 
   </div>
 
   <div class="charts-grid">
     <div class="panel chart-panel">
-      <h2>Registration Type Distribution</h2>
+      <h2>Registration Breakdown By Type Distribution</h2>
       <div class="chart-wrap"><canvas id="registrationChart"></canvas></div>
     </div>
     <div class="panel chart-panel">
