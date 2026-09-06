@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Registration Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f9;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+.container { max-width: 1480px; margin: 0 auto; padding: 20px 24px 40px; }
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+h1 { margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+.subtitle { color: var(--muted); font-size: 0.8125rem; margin-top: 4px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+button, .file-btn {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  background: var(--primary);
+  color: #fff;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+button:hover { background: var(--primary-hover); }
+button:active { transform: scale(0.98); }
+button.secondary, .file-btn.secondary {
+  background: #fff;
+  color: #334155;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+button.secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Status */
+.statusbar {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 0.75rem;
+  box-shadow: var(--shadow);
+}
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; background: var(--success);
+  margin-right: 8px; vertical-align: middle;
+  transition: background var(--transition);
+}
+.dot.warn { background: var(--warning); }
+.dot.error { background: var(--danger); }
+
+/* Filters */
+.filters {
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+select, input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  background: #fff;
+  color: var(--text);
+  font-size: 0.8125rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+.filter-actions { margin-top: 12px; display: flex; gap: 8px; }
+
+/* KPI Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+.card .label { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+.value { font-size: 1.75rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.03em; }
+.small { font-size: 0.6875rem; color: var(--muted); margin-top: 2px; }
+
+/* Charts & Panels */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+.panel h2 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: #1e293b;
+}
+.chart-panel { min-height: 300px; }
+.chart-wrap { position: relative; height: 240px; }
+.chart-wrap.tall { height: 300px; }
+.chart-note { font-size: 0.6875rem; color: var(--muted); margin-top: 6px; }
+
+/* Tables */
+.table-wrap { overflow: auto; border-radius: var(--radius-sm); }
+table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 580px; }
+th, td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+tbody tr { transition: background var(--transition); }
+tbody tr:hover { background: #f8fafc; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.active, .completed { background: #ecfdf5; color: #047857; }
+.initiated { background: #fffbeb; color: #b45309; }
+.failed { background: #fef2f2; color: #b91c1c; }
+.blank { background: #f1f5f9; color: #64748b; }
+
+/* Summary matrices */
+.summary-matrix { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+.summary-matrix th, .summary-matrix td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.summary-matrix th { background: #f8fafc; color: #334155; font-weight: 600; }
+.summary-matrix th:not(:first-child),
+.summary-matrix td:not(:first-child) { text-align: right; }
+.summary-matrix th:first-child,
+.summary-matrix td:first-child { text-align: left; }
+
+/* Tabs & Pagination */
+.tabbar {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 0;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  position: relative;
+}
+.tab:hover { color: var(--text); background: transparent; }
+.tab.active-tab {
+  color: var(--primary);
+  background: transparent;
+}
+.tab.active-tab::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px 2px 0 0;
+}
+.records-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.pagination { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pagination select { width: auto; height: 30px; padding: 0 8px; font-size: 0.75rem; }
+.page-size-label { margin: 0; font-size: 0.6875rem; color: var(--muted); font-weight: 600; }
+.page-btn { min-width: 30px; height: 30px; padding: 4px 8px; font-size: 0.875rem; }
+.page-info { font-size: 0.75rem; color: #475569; min-width: 70px; text-align: center; }
+
+.footer {
+  color: #94a3b8;
+  font-size: 0.6875rem;
+  text-align: center;
+  padding: 20px 0 8px;
+}
+.empty { text-align: center; color: var(--muted); padding: 28px; }
+
+@media (max-width: 1100px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid, .grid2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .container { padding: 12px; }
+  .cards { grid-template-columns: 1fr; }
+  .header { flex-direction: column; }
+  .filter-grid { grid-template-columns: 1fr 1fr; }
+  .records-footer { flex-direction: column; align-items: flex-start; }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>Customer Registration Dashboard</h1>
+      <div class="subtitle">Registered base = Active + Initiated &nbsp;|&nbsp; Activated base = Active only</div>
+    </div>
+    <div class="actions">
+      <button onclick="refreshData()">↻ Sync Google Sheet (CSV)</button>
+      <button class="secondary" onclick="downloadCSV()">Export Filtered CSV</button>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div><span id="statusDot" class="dot"></span><span id="sourceStatus">Waiting for Google Sheets data…</span></div>
+    <div id="lastUpdated">Last updated: —</div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-grid">
+      <div><label>Created Date From</label><input type="date" id="dateFrom"></div>
+      <div><label>Created Date To</label><input type="date" id="dateTo"></div>
+      <div><label>Customer Status</label><select id="customerStatus"><option value="">All</option></select></div>
+      <div><label>Registration Type</label><select id="registrationType"><option value="">All</option></select></div>
+      <div><label>IB Channel Status</label><select id="ibStatus"><option value="">All</option></select></div>
+      <div><label>MB Channel Status</label><select id="mbStatus"><option value="">All</option></select></div>
+      <div><label>OB Legacy Migration</label><select id="obStatus"><option value="">All</option></select></div>
+      <div><label>Search CIF / Name / ID</label><input id="search" placeholder="Type to search…" autocomplete="off"></div>
+    </div>
+    <div class="filter-actions">
+      <button onclick="applyFilters()">Apply Filters</button>
+      <button class="secondary" onclick="clearFilters()">Clear</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="label">Total User Records</div><div class="value" id="total">0</div><div class="small">Current filtered records</div></div>
+    <div class="card"><div class="label">Registered User Base</div><div class="value" id="registered">0</div><div class="small">Active + Initiated</div></div>
+    <div class="card"><div class="label">Activated User Base</div><div class="value" id="activated">0</div><div class="small">Active only</div></div>
+    <div class="card"><div class="label">Activation Rate</div><div class="value" id="rate">0%</div><div class="small">Activated ÷ Registered</div></div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="panel chart-panel">
+      <h2>Registration Type Distribution</h2>
+      <div class="chart-wrap"><canvas id="registrationChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Customer Status</h2>
+      <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Daily Registration Progress</h2>
+      <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
+      <div class="chart-note">Grouped by Created Date Time day</div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Monthly Registration Trend</h2>
+      <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+      <div class="chart-note">Grouped by Created Date Time month</div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Customer Type</h2>
+      <div class="chart-wrap"><canvas id="customerTypeChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Identification Type</h2>
+      <div class="chart-wrap"><canvas id="identificationChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Registration Validation Status</h2>
+      <div class="chart-wrap"><canvas id="validationChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>2FA Method</h2>
+      <div class="chart-wrap"><canvas id="twofaChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>IB / MB Activation</h2>
+      <div class="chart-wrap"><canvas id="activationChannelChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>T&amp;C Acceptance</h2>
+      <div class="chart-wrap"><canvas id="termsChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Data Migration Status</h2>
+      <div class="chart-wrap"><canvas id="dataMigrationChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>MB Inactivation Status</h2>
+      <div class="chart-wrap"><canvas id="mbInactivationChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Activity Status</h2>
+      <div class="chart-wrap"><canvas id="activityChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>IB vs MB Channel Status</h2>
+      <div class="chart-wrap"><canvas id="channelChart"></canvas></div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>OB Legacy Migration Status</h2>
+      <div class="chart-wrap"><canvas id="migrationChart"></canvas></div>
+      <div class="migration-status-table" style="margin-top:14px">
+        <div class="table-wrap">
+          <table id="migrationSummary" class="summary-matrix">
+            <thead>
+              <tr>
+                <th>Channel</th>
+                <th>COMPLETED</th>
+                <th>FAILED</th>
+                <th>N/A</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel chart-panel">
+      <h2>Top 10 Branches by Registration</h2>
+      <div class="chart-wrap tall"><canvas id="branchChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Registration Type Summary</h2>
+      <div class="table-wrap">
+        <table id="regSummary">
+          <thead><tr><th>Registration Type</th><th>Registered</th><th>Activated</th><th>Activation %</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Channel Summary</h2>
+      <div class="table-wrap">
+        <table id="channelSummary" class="summary-matrix">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Active</th>
+              <th>Initiated</th>
+              <th>N/A</th>
+              <th>To be activated</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="tabbar">
+      <button class="tab active-tab" onclick="showTab('records', this)">Customer Records</button>
+      <button class="tab" onclick="showTab('allfields', this)">Data Source Fields</button>
+    </div>
+    <div id="records">
+      <div class="table-wrap">
+        <table id="recordsTable">
+          <thead>
+            <tr>
+              <th>CIF Number</th><th>Customer Name</th><th>Customer Status</th>
+              <th>Identification Type</th><th>Identification No</th><th>Branch Code</th>
+              <th>Registration Type</th><th>Created Date Time</th>
+              <th>OB Legacy Data Migration Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="records-footer">
+        <div id="recordCount" class="small"></div>
+        <div class="pagination" id="pagination">
+          <label for="pageSize" class="page-size-label">Rows per page</label>
+          <select id="pageSize" onchange="changePageSize(this.value)">
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="250">250</option>
+          </select>
+          <button class="secondary page-btn" id="firstPage" onclick="goToPage(1)">«</button>
+          <button class="secondary page-btn" id="prevPage" onclick="goToPage(currentPage - 1)">‹</button>
+          <span id="pageInfo" class="page-info">Page 1 of 1</span>
+          <button class="secondary page-btn" id="nextPage" onclick="goToPage(currentPage + 1)">›</button>
+          <button class="secondary page-btn" id="lastPage" onclick="goToPage(totalPages())">»</button>
+        </div>
+      </div>
+    </div>
+    <div id="allfields" style="display:none">
+      <div class="small" style="margin-bottom:10px">Live Google Sheet source (first 100 filtered rows shown).</div>
+      <div class="table-wrap"><table id="sourceTable"><thead></thead><tbody></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="footer">Customer Registration Dashboard • Google Sheets CSV live sync • Filters run in the browser</div>
+</div>
+
+<script>
+const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1EykOgIlIyQJrjRdICoBIuhIchN8GA7Vvs28iMuBdL9ZPtbTwIDGQKHpQue6eZvpAb9VXxjeZP1Q2/pub?gid=1900187773&single=true&output=csv";
+
+const CANONICAL_FIELDS = [
+  "CIF Number","Username","Title","Customer Name","Customer Status","Customer Type",
+  "Primary Account Number","Mobile Number","E mail","Address","Date of Birth",
+  "Identification Type","Identification No","Branch Code","Registration Type","2FA Method",
+  "Created Date Time","OTP Authenticated Date Time","Registration Validation Status",
+  "Latest T&C Accepted By Customer","Latest T&C Accepted Date","IB Activated Date Time",
+  "MB Activated Date Time","Last login Date Time","Last transaction Date Time","Modified By",
+  "Modified Date Time","Activity Status","IB channel status","MB channel status",
+  "Data Migration Status","MB Inactivation Status","OB Legacy Data Migration Status"
+];
+
+const CHART_COLORS = [
+  "#2563eb","#10b981","#f59e0b","#ef4444","#8b5cf6",
+  "#06b6d4","#ec4899","#84cc16","#f97316","#6366f1"
+];
+
+let DATA = [];
+let FILTERED = [];
+let charts = {};
+let currentPage = 1;
+let pageSize = 25;
+let searchDebounce = null;
+let isRendering = false;
+
+/* ---------- Utils ---------- */
+function keyNorm(s) {
+  return String(s ?? "")
+    .replace(/^\uFEFF/, "")
+    .replace(/[\u00A0\u200B]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function normalize(r) {
+  const out = {};
+  Object.keys(r || {}).forEach(rawKey => {
+    const match = CANONICAL_FIELDS.find(f => keyNorm(f) === keyNorm(rawKey));
+    const key = match || String(rawKey).replace(/^\uFEFF/, "").trim();
+    out[key] = r[rawKey] == null ? "" : String(r[rawKey]).trim();
+  });
+  out["Customer Name"] = [out["Title"], out["Customer Name"]].filter(Boolean).join(" ");
+  CANONICAL_FIELDS.forEach(f => { if (out[f] === undefined) out[f] = ""; });
+  return out;
+}
+
+function unique(field) {
+  return [...new Set(DATA.map(x => x[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function fillSelect(id, field) {
+  const el = document.getElementById(id);
+  const old = el.value;
+  el.innerHTML = '<option value="">All</option>' + unique(field).map(v => `<option>${esc(v)}</option>`).join("");
+  if ([...el.options].some(o => o.value === old)) el.value = old;
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+}
+
+function parseDashboardDate(s) {
+  if (!s) return null;
+  const v = String(s).trim();
+  let d = new Date(v);
+  if (!Number.isNaN(d.getTime())) return d;
+  const m = v.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (m) {
+    const a = Number(m[1]), b = Number(m[2]), y = Number(m[3]);
+    if (a > 12) return new Date(y, b - 1, a);
+    if (b > 12) return new Date(y, a - 1, b);
+    return new Date(y, b - 1, a);
+  }
+  return null;
+}
+
+function dateOnly(s) {
+  const d = parseDashboardDate(s);
+  if (!d) return "";
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function monthKey(s) {
+  const d = parseDashboardDate(s);
+  if (!d) return "";
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function monthLabel(k) {
+  if (!k) return "Unknown";
+  const [y, m] = k.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: "short", year: "numeric" });
+}
+
+function countBy(field, rows = FILTERED) {
+  const out = {};
+  for (const r of rows) {
+    const v = String(r[field] || "Blank").trim() || "Blank";
+    out[v] = (out[v] || 0) + 1;
+  }
+  return out;
+}
+
+function setStatus(t, type = "ok") {
+  document.getElementById("sourceStatus").textContent = t;
+  const dot = document.getElementById("statusDot");
+  dot.className = "dot" + (type === "warn" ? " warn" : type === "error" ? " error" : "");
+}
+
+/* ---------- Filters ---------- */
+function applyFilters() {
+  const from = document.getElementById("dateFrom").value;
+  const to = document.getElementById("dateTo").value;
+  const cs = document.getElementById("customerStatus").value;
+  const rt = document.getElementById("registrationType").value;
+  const ib = document.getElementById("ibStatus").value;
+  const mb = document.getElementById("mbStatus").value;
+  const ob = document.getElementById("obStatus").value;
+  const q = document.getElementById("search").value.toLowerCase().trim();
+
+  FILTERED = DATA.filter(r => {
+    const d = dateOnly(r["Created Date Time"]);
+    return (!from || d >= from) &&
+           (!to || d <= to) &&
+           (!cs || r["Customer Status"] === cs) &&
+           (!rt || r["Registration Type"] === rt) &&
+           (!ib || r["IB channel status"] === ib) &&
+           (!mb || r["MB channel status"] === mb) &&
+           (!ob || r["OB Legacy Data Migration Status"] === ob) &&
+           (!q || ["CIF Number", "Customer Name", "Identification No", "Branch Code"]
+             .some(k => (r[k] || "").toLowerCase().includes(q)));
+  });
+  currentPage = 1;
+  render();
+}
+
+function clearFilters() {
+  ["dateFrom", "dateTo", "customerStatus", "registrationType", "ibStatus", "mbStatus", "obStatus", "search"]
+    .forEach(id => document.getElementById(id).value = "");
+  applyFilters();
+}
+
+/* Debounced search + auto-apply on selects/dates */
+document.getElementById("search").addEventListener("input", () => {
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(applyFilters, 280);
+});
+["dateFrom", "dateTo", "customerStatus", "registrationType", "ibStatus", "mbStatus", "obStatus"]
+  .forEach(id => {
+    document.getElementById(id).addEventListener("change", () => {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(applyFilters, 120);
+    });
+  });
+
+/* ---------- Charts ---------- */
+const valueLabelsPlugin = {
+  id: "valueLabels",
+  afterDatasetsDraw(chart) {
+    const type = chart.config.type;
+    if (type !== "bar") return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.font = "600 11px Inter, system-ui, sans-serif";
+    ctx.fillStyle = "#1e293b";
+    chart.data.datasets.forEach((dataset, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (meta.hidden) return;
+      meta.data.forEach((el, i) => {
+        const val = dataset.data[i];
+        if (val == null || Number.isNaN(Number(val))) return;
+        const text = Number(val).toLocaleString();
+        const pos = el.tooltipPosition();
+        if (chart.options.indexAxis === "y") {
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+          ctx.fillText(text, pos.x + 6, pos.y);
+        } else {
+          ctx.textAlign = "center";
+          ctx.textBaseline = "bottom";
+          ctx.fillText(text, pos.x, pos.y - 4);
+        }
+      });
+    });
+    ctx.restore();
+  }
+};
+Chart.register(valueLabelsPlugin);
+
+function destroyChart(id) {
+  if (charts[id]) {
+    charts[id].destroy();
+    delete charts[id];
+  }
+}
+
+function chartBaseOptions() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 280 },
+    layout: { padding: { top: 18, right: 10, left: 4, bottom: 2 } },
+    plugins: {
+      legend: { position: "bottom", labels: { boxWidth: 10, usePointStyle: true, font: { size: 11 } } },
+      tooltip: { mode: "index", intersect: false }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } }
+    }
+  };
+}
+
+function doughnutLegendLabels(chart) {
+  const labels = chart.data.labels || [];
+  const data = chart.data.datasets[0]?.data || [];
+  return labels.map((label, i) => ({
+    text: `${label} — ${Number(data[i] || 0).toLocaleString()}`,
+    fillStyle: chart.data.datasets[0].backgroundColor?.[i],
+    strokeStyle: chart.data.datasets[0].borderColor?.[i],
+    lineWidth: 0,
+    hidden: false,
+    index: i
+  }));
+}
+
+function makeBarChart(id, labels, data, opts = {}) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const horizontal = opts.horizontal || labels.length >= 7;
+  const existing = charts[id];
+  if (existing) {
+    existing.data.labels = labels;
+    existing.data.datasets[0].data = data;
+    existing.options.indexAxis = horizontal ? "y" : "x";
+    existing.update("none");
+    return;
+  }
+  charts[id] = new Chart(el, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: opts.label || "Records",
+        data,
+        borderRadius: 5,
+        backgroundColor: CHART_COLORS[0] + "cc",
+        borderColor: CHART_COLORS[0],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      ...chartBaseOptions(),
+      indexAxis: horizontal ? "y" : "x",
+      layout: { padding: { top: horizontal ? 6 : 22, right: horizontal ? 36 : 10, left: 4, bottom: 4 } },
+      plugins: { ...chartBaseOptions().plugins, legend: { display: false }, valueLabels: {} },
+      scales: horizontal
+        ? { x: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } }, y: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+        : { x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 30 } }, y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } } }
+    }
+  });
+}
+
+function makeDoughnut(id, labels, data) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const existing = charts[id];
+  if (existing) {
+    existing.data.labels = labels;
+    existing.data.datasets[0].data = data;
+    existing.update("none");
+    return;
+  }
+  charts[id] = new Chart(el, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: labels.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + "e6"),
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 280 },
+      cutout: "58%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: { boxWidth: 10, usePointStyle: true, font: { size: 11 }, generateLabels: doughnutLegendLabels }
+        },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${Number(ctx.raw || 0).toLocaleString()}` } }
+      }
+    }
+  });
+}
+
+function categoricalChart(id, field, maxItems = 12) {
+  const counts = countBy(field);
+  let entries = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  if (entries.length > maxItems) {
+    const top = entries.slice(0, maxItems);
+    const other = entries.slice(maxItems).reduce((s, x) => s + x[1], 0);
+    if (other) top.push(["Other", other]);
+    entries = top;
+  }
+  makeBarChart(id, entries.map(x => x[0]), entries.map(x => x[1]));
+}
+
+function renderCharts() {
+  if (typeof Chart === "undefined") return;
+
+  // Registration Type
+  const types = countBy("Registration Type");
+  makeBarChart("registrationChart", Object.keys(types), Object.values(types));
+
+  // Customer Status
+  const statuses = countBy("Customer Status");
+  makeDoughnut("statusChart", Object.keys(statuses), Object.values(statuses));
+
+  // Daily
+  const days = {};
+  FILTERED.forEach(r => {
+    const k = dateOnly(r["Created Date Time"]);
+    if (k) days[k] = (days[k] || 0) + 1;
+  });
+  const dayKeys = Object.keys(days).sort();
+  const dayLabels = dayKeys.map(k => {
+    const d = new Date(k + "T00:00:00");
+    return d.toLocaleDateString(undefined, { day: "2-digit", month: "short" });
+  });
+  const dayData = dayKeys.map(k => days[k]);
+  if (charts.dailyChart) {
+    charts.dailyChart.data.labels = dayLabels;
+    charts.dailyChart.data.datasets[0].data = dayData;
+    charts.dailyChart.update("none");
+  } else {
+    charts.dailyChart = new Chart(document.getElementById("dailyChart"), {
+      type: "line",
+      data: {
+        labels: dayLabels,
+        datasets: [{
+          label: "Registrations",
+          data: dayData,
+          tension: 0.3,
+          fill: false,
+          pointRadius: 2.5,
+          pointHoverRadius: 5,
+          borderWidth: 2,
+          borderColor: CHART_COLORS[0],
+          backgroundColor: CHART_COLORS[0]
+        }]
+      },
+      options: {
+        ...chartBaseOptions(),
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          ...chartBaseOptions().plugins,
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: items => {
+                if (!items.length) return "";
+                const k = dayKeys[items[0].dataIndex];
+                return new Date(k + "T00:00:00").toLocaleDateString(undefined, {
+                  weekday: "short", day: "2-digit", month: "short", year: "numeric"
+                });
+              },
+              label: ctx => ` Registrations: ${Number(ctx.raw || 0).toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 40, autoSkip: true, maxTicksLimit: 14 } },
+          y: { beginAtZero: true, ticks: { font: { size: 10 }, precision: 0 } }
+        }
+      }
+    });
+  }
+
+  // Monthly
+  const months = {};
+  FILTERED.forEach(r => {
+    const k = monthKey(r["Created Date Time"]);
+    if (k) months[k] = (months[k] || 0) + 1;
+  });
+  const monthKeys = Object.keys(months).sort();
+  if (charts.monthlyChart) {
+    charts.monthlyChart.data.labels = monthKeys.map(monthLabel);
+    charts.monthlyChart.data.datasets[0].data = monthKeys.map(k => months[k]);
+    charts.monthlyChart.update("none");
+  } else {
+    charts.monthlyChart = new Chart(document.getElementById("monthlyChart"), {
+      type: "line",
+      data: {
+        labels: monthKeys.map(monthLabel),
+        datasets: [{
+          label: "Registrations",
+          data: monthKeys.map(k => months[k]),
+          tension: 0.3,
+          fill: false,
+          pointRadius: 3,
+          borderWidth: 2,
+          borderColor: CHART_COLORS[1],
+          backgroundColor: CHART_COLORS[1]
+        }]
+      },
+      options: {
+        ...chartBaseOptions(),
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          ...chartBaseOptions().plugins,
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` Registrations: ${Number(ctx.raw || 0).toLocaleString()}` } }
+        }
+      }
+    });
+  }
+
+  // Channel comparison
+  const channelStatuses = new Set();
+  FILTERED.forEach(r => {
+    channelStatuses.add(String(r["IB channel status"] || "Blank").trim() || "Blank");
+    channelStatuses.add(String(r["MB channel status"] || "Blank").trim() || "Blank");
+  });
+  const channelLabels = [...channelStatuses].sort();
+  const ib = channelLabels.map(s => FILTERED.filter(r => (String(r["IB channel status"] || "Blank").trim() || "Blank") === s).length);
+  const mb = channelLabels.map(s => FILTERED.filter(r => (String(r["MB channel status"] || "Blank").trim() || "Blank") === s).length);
+  if (charts.channelChart) {
+    charts.channelChart.data.labels = channelLabels;
+    charts.channelChart.data.datasets[0].data = ib;
+    charts.channelChart.data.datasets[1].data = mb;
+    charts.channelChart.update("none");
+  } else {
+    charts.channelChart = new Chart(document.getElementById("channelChart"), {
+      type: "bar",
+      data: {
+        labels: channelLabels,
+        datasets: [
+          { label: "IB Channel", data: ib, borderRadius: 4, backgroundColor: CHART_COLORS[0] + "cc" },
+          { label: "MB Channel", data: mb, borderRadius: 4, backgroundColor: CHART_COLORS[1] + "cc" }
+        ]
+      },
+      options: {
+        ...chartBaseOptions(),
+        plugins: { ...chartBaseOptions().plugins, valueLabels: {} }
+      }
+    });
+  }
+
+  // Migration doughnut
+  const migration = countBy("OB Legacy Data Migration Status");
+  makeDoughnut("migrationChart", Object.keys(migration), Object.values(migration));
+
+  // Top branches
+  const branches = countBy("Branch Code");
+  const topBranches = Object.entries(branches).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 10);
+  makeBarChart("branchChart", topBranches.map(x => x[0]), topBranches.map(x => x[1]), { horizontal: true });
+
+  // Categorical
+  categoricalChart("customerTypeChart", "Customer Type");
+  categoricalChart("identificationChart", "Identification Type");
+  categoricalChart("validationChart", "Registration Validation Status");
+  categoricalChart("twofaChart", "2FA Method");
+  categoricalChart("dataMigrationChart", "Data Migration Status");
+  categoricalChart("mbInactivationChart", "MB Inactivation Status");
+  categoricalChart("activityChart", "Activity Status");
+
+  // Activation channel
+  const activationChannel = {
+    "IB Activated": FILTERED.filter(r => !!parseDashboardDate(String(r["IB Activated Date Time"] || ""))).length,
+    "MB Activated": FILTERED.filter(r => !!parseDashboardDate(String(r["MB Activated Date Time"] || ""))).length
+  };
+  makeBarChart("activationChannelChart", Object.keys(activationChannel), Object.values(activationChannel));
+
+  // T&C
+  const terms = {
+    "Accepted": FILTERED.filter(r => String(r["Latest T&C Accepted By Customer"] || "").trim() !== "").length,
+    "Not Accepted": FILTERED.filter(r => String(r["Latest T&C Accepted By Customer"] || "").trim() === "").length
+  };
+  makeDoughnut("termsChart", Object.keys(terms), Object.values(terms));
+}
+
+/* ---------- Render ---------- */
+function render() {
+  if (isRendering) return;
+  isRendering = true;
+
+  const registered = FILTERED.filter(r => ["Active", "Initiated"].includes(r["Customer Status"])).length;
+  const activated = FILTERED.filter(r => r["Customer Status"] === "Active").length;
+
+  document.getElementById("total").textContent = FILTERED.length.toLocaleString();
+  document.getElementById("registered").textContent = registered.toLocaleString();
+  document.getElementById("activated").textContent = activated.toLocaleString();
+  document.getElementById("rate").textContent = (registered ? ((activated / registered) * 100).toFixed(1) : "0") + "%";
+
+  // Registration summary
+  const types = {};
+  FILTERED.forEach(r => {
+    const t = r["Registration Type"] || "Blank";
+    if (!types[t]) types[t] = { registered: 0, activated: 0 };
+    if (["Active", "Initiated"].includes(r["Customer Status"])) types[t].registered++;
+    if (r["Customer Status"] === "Active") types[t].activated++;
+  });
+  const regBody = document.querySelector("#regSummary tbody");
+  regBody.innerHTML = Object.entries(types).sort().map(([t, v]) =>
+    `<tr><td>${esc(t)}</td><td>${v.registered.toLocaleString()}</td><td>${v.activated.toLocaleString()}</td><td>${v.registered ? (v.activated / v.registered * 100).toFixed(1) : 0}%</td></tr>`
+  ).join("") || '<tr><td colspan="4" class="empty">No records</td></tr>';
+
+  // Channel summary
+  const channelStatuses = ["Active", "Initiated", "N/A", "To be activated"];
+  const channelRows = [["IB Channel", "IB channel status"], ["MB Channel", "MB channel status"]];
+  document.querySelector("#channelSummary tbody").innerHTML = channelRows.map(([label, field]) => {
+    const counts = { "Active": 0, "Initiated": 0, "N/A": 0, "To be activated": 0 };
+    FILTERED.forEach(r => {
+      const raw = String(r[field] ?? "").trim();
+      const status = channelStatuses.find(s => s.toLowerCase() === raw.toLowerCase()) || "N/A";
+      counts[status]++;
+    });
+    return `<tr>
+      <td>${esc(label)}</td>
+      <td>${counts["Active"].toLocaleString()}</td>
+      <td>${counts["Initiated"].toLocaleString()}</td>
+      <td>${counts["N/A"].toLocaleString()}</td>
+      <td>${counts["To be activated"].toLocaleString()}</td>
+    </tr>`;
+  }).join("") || '<tr><td colspan="5" class="empty">No records</td></tr>';
+
+  // Migration summary
+  const migrationCounts = { "COMPLETED": 0, "FAILED": 0, "N/A": 0 };
+  FILTERED.forEach(r => {
+    const raw = String(r["OB Legacy Data Migration Status"] ?? "").trim();
+    const status = ["COMPLETED", "FAILED", "N/A"].find(s => s.toLowerCase() === raw.toLowerCase()) || "N/A";
+    migrationCounts[status]++;
+  });
+  document.querySelector("#migrationSummary tbody").innerHTML = `<tr>
+    <td>OB Legacy Migration</td>
+    <td>${migrationCounts["COMPLETED"].toLocaleString()}</td>
+    <td>${migrationCounts["FAILED"].toLocaleString()}</td>
+    <td>${migrationCounts["N/A"].toLocaleString()}</td>
+  </tr>`;
+
+  // Records table (DocumentFragment for speed)
+  const pages = totalPages();
+  if (currentPage > pages) currentPage = pages;
+  if (currentPage < 1) currentPage = 1;
+  const start = (currentPage - 1) * pageSize;
+  const pageRows = FILTERED.slice(start, start + pageSize);
+
+  const frag = document.createDocumentFragment();
+  const tbody = document.querySelector("#recordsTable tbody");
+  tbody.innerHTML = "";
+  if (!pageRows.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty">No matching customer records</td></tr>';
+  } else {
+    pageRows.forEach(r => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${esc(r["CIF Number"])}</td>
+        <td>${esc(r["Customer Name"])}</td>
+        <td>${badge(r["Customer Status"])}</td>
+        <td>${esc(r["Identification Type"])}</td>
+        <td>${esc(r["Identification No"])}</td>
+        <td>${esc(r["Branch Code"])}</td>
+        <td>${esc(r["Registration Type"])}</td>
+        <td>${esc(r["Created Date Time"])}</td>
+        <td>${badge(r["OB Legacy Data Migration Status"])}</td>`;
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+
+  const shownFrom = FILTERED.length ? start + 1 : 0;
+  const shownTo = Math.min(start + pageSize, FILTERED.length);
+  document.getElementById("recordCount").textContent =
+    `Showing ${shownFrom.toLocaleString()}–${shownTo.toLocaleString()} of ${FILTERED.length.toLocaleString()} record(s)`;
+
+  updatePagination();
+  renderCharts();
+  renderSourcePreview();
+
+  isRendering = false;
+}
+
+function totalPages() {
+  return Math.max(1, Math.ceil(FILTERED.length / pageSize));
+}
+
+function updatePagination() {
+  const pages = totalPages();
+  document.getElementById("pageInfo").textContent = `Page ${currentPage.toLocaleString()} of ${pages.toLocaleString()}`;
+  document.getElementById("firstPage").disabled = currentPage <= 1;
+  document.getElementById("prevPage").disabled = currentPage <= 1;
+  document.getElementById("nextPage").disabled = currentPage >= pages;
+  document.getElementById("lastPage").disabled = currentPage >= pages;
+}
+
+function goToPage(page) {
+  const pages = totalPages();
+  currentPage = Math.max(1, Math.min(Number(page) || 1, pages));
+  render();
+}
+
+function changePageSize(size) {
+  pageSize = Math.max(1, Number(size) || 25);
+  currentPage = 1;
+  render();
+}
+
+function badge(v) {
+  if (!v) return '<span class="badge blank">Blank</span>';
+  const x = v.toLowerCase();
+  let c = "blank";
+  if (x.includes("active") && !x.includes("inactive")) c = "active";
+  else if (x.includes("initiated")) c = "initiated";
+  else if (x.includes("completed")) c = "completed";
+  else if (x.includes("failed")) c = "failed";
+  return `<span class="badge ${c}">${esc(v)}</span>`;
+}
+
+function renderSourcePreview() {
+  const fields = Object.keys(DATA[0] || {});
+  document.querySelector("#sourceTable thead").innerHTML =
+    "<tr>" + fields.map(f => `<th>${esc(f)}</th>`).join("") + "</tr>";
+  document.querySelector("#sourceTable tbody").innerHTML =
+    FILTERED.slice(0, 100).map(r =>
+      "<tr>" + fields.map(f => `<td>${esc(r[f])}</td>`).join("") + "</tr>"
+    ).join("");
+}
+
+function showTab(id, btn) {
+  document.getElementById("records").style.display = id === "records" ? "block" : "none";
+  document.getElementById("allfields").style.display = id === "allfields" ? "block" : "none";
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active-tab"));
+  btn.classList.add("active-tab");
+}
+
+/* ---------- Data ---------- */
+function csvParse(text) {
+  const rows = [];
+  let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i], nx = text[i + 1];
+    if (ch === '"') {
+      if (q && nx === '"') { cell += '"'; i++; }
+      else q = !q;
+    } else if (ch === "," && !q) {
+      row.push(cell); cell = "";
+    } else if ((ch === "\n" || ch === "\r") && !q) {
+      if (ch === "\r" && nx === "\n") i++;
+      row.push(cell); cell = "";
+      if (row.some(x => x.trim() !== "")) rows.push(row);
+      row = [];
+    } else {
+      cell += ch;
+    }
+  }
+  row.push(cell);
+  if (row.some(x => x.trim() !== "")) rows.push(row);
+  if (!rows.length) return [];
+  const headers = rows[0].map(x => x.trim());
+  return rows.slice(1).map(a => Object.fromEntries(headers.map((k, i) => [k, (a[i] || "").trim()])));
+}
+
+async function refreshData() {
+  try {
+    setStatus("Loading data from Google Sheet (CSV)…", "warn");
+    const url = GOOGLE_CSV_URL + (GOOGLE_CSV_URL.includes("?") ? "&" : "?") + "_ts=" + Date.now();
+    const res = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      redirect: "follow"
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const rawText = (await res.text()).replace(/^\uFEFF/, "").trim();
+    if (!rawText) throw new Error("Empty response from Google Sheet");
+
+    const records = csvParse(rawText);
+    if (!records.length) throw new Error("No records found in CSV");
+
+    DATA = records.map(normalize);
+    ["customerStatus", "registrationType", "ibStatus", "mbStatus", "obStatus"].forEach((id, i) => {
+      fillSelect(id, [
+        "Customer Status",
+        "Registration Type",
+        "IB channel status",
+        "MB channel status",
+        "OB Legacy Data Migration Status"
+      ][i]);
+    });
+    FILTERED = [...DATA];
+    currentPage = 1;
+    render();
+    setStatus(`Google Sheet connected (CSV) • ${DATA.length.toLocaleString()} rows`, "ok");
+    document.getElementById("lastUpdated").textContent =
+      "Last successful sync: " + new Date().toLocaleString();
+  } catch (e) {
+    console.error("Google Sheet CSV error:", e);
+    const msg = String(e.message || e);
+    const isCors = msg.includes("Failed to fetch") || msg.includes("NetworkError") || msg.includes("CORS") || msg.includes("Load failed");
+    if (isCors) {
+      setStatus("CORS blocked — open via local server (see instructions)", "error");
+      document.getElementById("lastUpdated").textContent =
+        "Do not open the HTML as a file. Use a local server (VS Code Live Server, or run: npx serve)";
+    } else {
+      setStatus("Google Sheet CSV sync failed — " + msg, "error");
+      document.getElementById("lastUpdated").textContent = "Sync error: " + msg;
+    }
+  }
+}
+
+function downloadCSV() {
+  const headers = [
+    "CIF Number", "Customer Name", "Customer Status", "Identification Type",
+    "Identification No", "Branch Code", "Registration Type", "Created Date Time",
+    "OB Legacy Data Migration Status"
+  ];
+  const lines = [headers, ...FILTERED.map(r => headers.map(h => r[h] || ""))]
+    .map(a => a.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","));
+  const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "customer_registration_filtered.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* Init */
+updatePagination();
+setTimeout(refreshData, 400);
+</script>
+</body>
+</html>
